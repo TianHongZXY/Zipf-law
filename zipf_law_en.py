@@ -36,33 +36,22 @@ def clean_corpus(corpus):
         new_words[i] = wnl.lemmatize(word=new_words[i], pos=pos)
     return new_text, new_words
 
-def load_stop_words(stop_words_file):
-    stop_words = []
-    with open(stop_words_file, 'r') as f:
-        for line in f.readlines():
-            line = line.strip('\n')
-            stop_words.append(line)
-    return stop_words
-
-def count_freq(words, n=None, stop_words=None):
+def count_freq(words, n=None):
     freq = collections.Counter([w for w in words])
     cnt = []
     words = []
-    for key, value in freq.most_common():
+    for key, value in freq.most_common(n):
         # print(key, ':', value)
-        if stop_words and key in stop_words:
-            continue
         words.append(key)
         cnt.append(value)
-        if(n and len(words) == n):
-            break
     return words, cnt
 
 def plot_freq(words, freq):
+    plt.figure(figsize=(12, 9), dpi=300)
     plt.plot(words, freq)
-    plt.xticks(rotation=90)
-    plt.xlabel('Words', fontsize=14)
-    plt.ylabel('Frequency', fontsize=14)
+    plt.xticks(fontsize=15, rotation=90)
+    plt.xlabel('Words', fontsize=16)
+    plt.ylabel('Frequency', fontsize=16)
     plt.show()
 
 
@@ -70,9 +59,7 @@ if __name__ == '__main__':
     wnl = WordNetLemmatizer()
     corpus = gutenberg.raw()
     _, words = clean_corpus(corpus=corpus)
-    stop_words_file = '停用词表.txt'
-    stop_words = load_stop_words(stop_words_file=stop_words_file)
-    words, freq = count_freq(words=words, n=50, stop_words=stop_words)  # 统计频率，返回最高的50个单词及频率
+    words, freq = count_freq(words=words, n=50)  # 统计频率，返回最高的50个单词及频率
     # print('一共有', len(words), '个单词')
     plot_freq(words=words, freq=freq) # 画出单词-频率图
 

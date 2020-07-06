@@ -1,20 +1,34 @@
 import re
+import collections
 import nltk
 import jieba
 import matplotlib.pyplot as plt
-from zipf_law_en import count_freq, plot_freq, load_stop_words
+from zipf_law_en import load_stop_words
 plt.rcParams["font.family"] = 'Arial Unicode MS'
 
 
 def load_book(filename):
-    f = open(filename,'r', encoding='gb18030')
+    f = open(filename,'r')
     book = f.read()
     f.close()
     return book
 
+def count_freq(words, n=None, stop_words=None):
+    freq = collections.Counter([w for w in words])
+    cnt = []
+    words = []
+    for key, value in freq.most_common():
+        # print(key, ':', value)
+        if stop_words and key in stop_words:
+            continue
+        words.append(key)
+        cnt.append(value)
+        if(n and len(words) == n):
+            break
+    return words, cnt
+
 def clean_zh_corpus(corpus):
     rule = re.compile(r'[^\u4e00-\u9fa5]') # 去除汉字以外的所有字符，包括标点、英文字母等
-    # rule = re.compile(u'[^a-zA-Z.,;《》？！“”‘’@#￥%…&×（）——+【】{};；●，。&～、|\s:：' + digits + punctuation + '\u4e00-\u9fa5]+')
     s = rule.sub('', corpus)
     return s
 
@@ -23,9 +37,16 @@ def cut_word(text):
     jieba_txt = ' '.join(jieba_list)
     return jieba_txt, jieba_list
 
+def plot_freq(words, freq):
+    plt.figure(figsize=(12, 9), dpi=300)
+    plt.plot(words, freq)
+    plt.xticks(fontsize=13, rotation=90)
+    plt.xlabel('Words', fontsize=14)
+    plt.ylabel('Frequency', fontsize=14)
+    plt.show()
 
 if __name__ == '__main__':
-    filename = '毛泽东文选.txt'
+    filename = '诛仙.txt'
     book = load_book(filename)
     book = clean_zh_corpus(corpus=book)
     text, words = cut_word(text=book)
