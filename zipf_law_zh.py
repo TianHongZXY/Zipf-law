@@ -3,7 +3,6 @@ import collections
 import nltk
 import jieba
 import matplotlib.pyplot as plt
-from zipf_law_en import load_stop_words
 plt.rcParams["font.family"] = 'Arial Unicode MS'
 
 
@@ -12,6 +11,14 @@ def load_book(filename):
     book = f.read()
     f.close()
     return book
+
+def load_stop_words(stop_words_file):
+    stop_words = []
+    with open(stop_words_file, 'r') as f:
+        for line in f.readlines():
+            line = line.strip('\n')
+            stop_words.append(line)
+    return stop_words
 
 def count_freq(words, n=None, stop_words=None):
     freq = collections.Counter([w for w in words])
